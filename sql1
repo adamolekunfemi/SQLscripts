@@ -1,0 +1,7 @@
+select AccountID, Date, DaySumAmount, 
+Sum5Days = CASE WHEN ROW_NUMBER() OVER (partition by AccountID ORDER BY Date) >= 1
+    THEN SUM(DaySumAmount) OVER (partition by AccountID ORDER BY Date ROWS BETWEEN 5 PRECEDING AND 1 PRECEDING)
+    END
+    ,DayCount
+from (select Date,AccountID,SUM(Amount) as DaySumAmount,COUNT(*) as DayCount from Trans GROUP by [Date],AccountID) rec
+order by AccountID
